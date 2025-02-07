@@ -87,13 +87,12 @@ func NewConfFromURL(proxyURL *url.URL) (*NeoregConf, error) {
 		return nil, errors.New("username and password required in URL")
 	}
 
-	// 根据scheme确定target
-	target := "http"
+	scheme := "http"
 	switch proxyURL.Scheme {
 	case "neoreg":
-		target = "http"
+		scheme = "http"
 	case "neoregs":
-		target = "https"
+		scheme = "https"
 	default:
 		return nil, fmt.Errorf("unsupported scheme: %s", proxyURL.Scheme)
 	}
@@ -109,7 +108,7 @@ func NewConfFromURL(proxyURL *url.URL) (*NeoregConf, error) {
 
 	return &NeoregConf{
 		Dial:      net.Dial,
-		Protocol:  target,
+		Protocol:  scheme,
 		EncodeMap: encodeMap,
 		DecodeMap: decodeMap,
 		Key:       key,
@@ -120,16 +119,9 @@ func NewConfFromURL(proxyURL *url.URL) (*NeoregConf, error) {
 
 // Dial 实现了Client接口
 func (c *NeoregClient) Dial(network, address string) (net.Conn, error) {
-	conn, err := c.conf.Dial("tcp", c.proxy.Host)
-	if err != nil {
-		return nil, fmt.Errorf("connect to neoreg server failed: %v", err)
-	}
-
-	// 构造完整URL
 	url := fmt.Sprintf("%s://%s%s", c.conf.Protocol, c.proxy.Host, c.proxy.Path)
 
 	nconn := &neoregConn{
-		Conn:   conn,
 		url:    url,
 		mask:   randMask(),
 		config: c.conf,
@@ -137,7 +129,6 @@ func (c *NeoregClient) Dial(network, address string) (net.Conn, error) {
 
 	// 建立目标连接
 	if err := nconn.connect(address); err != nil {
-		conn.Close()
 		return nil, err
 	}
 
