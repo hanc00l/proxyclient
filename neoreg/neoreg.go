@@ -4,17 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/chainreactors/proxyclient"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
 )
-
-func init() {
-	proxyclient.RegisterScheme("NEOREG", NewNeoregClient)
-	proxyclient.RegisterScheme("NEOREGS", NewNeoregClient)
-}
 
 // 常量定义
 const (
@@ -39,28 +33,10 @@ var (
 	BASE64CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 )
 
-func NewNeoregClient(proxy *url.URL, upstreamDial proxyclient.Dial) (dial proxyclient.Dial, err error) {
-	conf, err := NewConfFromURL(proxy)
-	if err != nil {
-		return nil, err
-	}
-	if upstreamDial != nil {
-		conf.Dial = upstreamDial
-	}
-	client := &NeoregClient{
-		proxy: proxy,
-		conf:  conf,
-	}
-
-	return func(network, address string) (net.Conn, error) {
-		return client.Dial(network, address)
-	}, nil
-}
-
 // NeoregClient 实现了Client接口
 type NeoregClient struct {
-	proxy *url.URL
-	conf  *NeoregConf
+	Proxy *url.URL
+	Conf  *NeoregConf
 }
 
 // NeoregConf 配置结构
@@ -119,12 +95,12 @@ func NewConfFromURL(proxyURL *url.URL) (*NeoregConf, error) {
 
 // Dial 实现了Client接口
 func (c *NeoregClient) Dial(network, address string) (net.Conn, error) {
-	url := fmt.Sprintf("%s://%s%s", c.conf.Protocol, c.proxy.Host, c.proxy.Path)
+	url := fmt.Sprintf("%s://%s%s", c.Conf.Protocol, c.Proxy.Host, c.Proxy.Path)
 
 	nconn := &neoregConn{
 		url:    url,
 		mask:   randMask(),
-		config: c.conf,
+		config: c.Conf,
 	}
 
 	// 建立目标连接

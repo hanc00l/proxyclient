@@ -8,8 +8,14 @@ import (
 	"time"
 
 	httpProxy "github.com/chainreactors/proxyclient/http"
+	_ "github.com/chainreactors/proxyclient/neoreg"
 	socksProxy "github.com/chainreactors/proxyclient/socks"
+	_ "github.com/chainreactors/proxyclient/suo5"
 )
+
+func init() {
+
+}
 
 func newDirectProxyClient(proxy *url.URL, _ Dial) (dial Dial, err error) {
 	dial = net.Dial

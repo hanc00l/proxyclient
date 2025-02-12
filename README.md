@@ -1,12 +1,13 @@
 # ProxyClient
 
-the proxy client library 
+the proxy client library
 
 refactor from github.com/RouterScript/ProxyClient
 
 supported SOCKS4, SOCKS4A, SOCKS5, HTTP, HTTPS etc proxy protocols
 
 ## Supported Schemes
+
 - [x] Direct
 - [x] Reject
 - [x] Blackhole
@@ -15,12 +16,13 @@ supported SOCKS4, SOCKS4A, SOCKS5, HTTP, HTTPS etc proxy protocols
 - [x] SOCKS5 (fixed)
 - [x] ShadowSocks (fixed)
 - [x] SSH Agent (fixed)
-- [ ] suo5
-- [ ] neoreg
+- [x] suo5
+- [x] neoreg
 
 # Documentation
 
 # Example
+
 ```go
 package main
 

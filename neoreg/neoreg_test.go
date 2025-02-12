@@ -84,8 +84,8 @@ func TestNeoregClientDial(t *testing.T) {
 	}
 
 	client := &NeoregClient{
-		proxy: proxyURL,
-		conf:  conf,
+		Proxy: proxyURL,
+		Conf:  conf,
 	}
 
 	// Test connection

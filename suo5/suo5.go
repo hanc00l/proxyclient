@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/chainreactors/proxyclient"
 	"github.com/chainreactors/proxyclient/suo5/netrans"
 	utls "github.com/refraction-networking/utls"
 	"github.com/zema1/rawhttp"
@@ -19,15 +18,10 @@ import (
 	"time"
 )
 
-func init() {
-	proxyclient.RegisterScheme("SUO5", NewSuo5Client)
-	proxyclient.RegisterScheme("SUO5S", NewSuo5Client)
-}
-
 // Suo5Client 实现了Client接口，用于与目标通信而非直接暴露 SOCKS5 服务
 type Suo5Client struct {
-	proxy *url.URL
-	conf  *Suo5Conf
+	Proxy *url.URL
+	Conf  *Suo5Conf
 }
 
 // Suo5Conf 包含了多个类型的 HTTP 客户端，以及嵌入的 Suo5 配置
@@ -36,24 +30,7 @@ type Suo5Conf struct {
 	noTimeoutClient *http.Client
 	rawClient       *rawhttp.Client
 	*Suo5Config
-	upstream proxyclient.Dial
-}
-
-// NewSuo5Client 创建一个新的 Suo5Client
-func NewSuo5Client(proxy *url.URL, upstreamDial proxyclient.Dial) (dial proxyclient.Dial, err error) {
-	conf, err := NewConfFromURL(proxy)
-	if err != nil {
-		return nil, err
-	}
-	conf.upstream = upstreamDial
-	c := &Suo5Client{
-		proxy: proxy,
-		conf:  conf,
-	}
-
-	return func(network, address string) (net.Conn, error) {
-		return c.Dial(network, address)
-	}, nil
+	Upstream func(network, address string) (net.Conn, error)
 }
 
 // NewConfFromURL 从URL中解析用户名密码生成配置
@@ -120,7 +97,7 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 		if err != nil {
 			return nil, err
 		}
-		//logs.Log.Infof("using upstream proxy %v", proxy)
+		//logs.Log.Infof("using Upstream proxy %v", proxy)
 		tr.Proxy = http.ProxyURL(u)
 	}
 	if config.RedirectURL != "" {
@@ -152,7 +129,7 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 	// 构建 Suo5Conf，并初始化 HTTP 客户端
 	suo5Conf := &Suo5Conf{
 		Suo5Config:      config,
-		upstream:        net.Dial,
+		Upstream:        net.Dial,
 		normalClient:    normalClient,
 		noTimeoutClient: noTimeoutClient,
 		rawClient:       rawClient,
@@ -164,12 +141,12 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 // Dial 实现了Client接口
 func (c *Suo5Client) Dial(network, address string) (net.Conn, error) {
 	// 创建一个新的 suo5Conn 连接
-	//conn, err := c.conf.upstream(network, address)
+	//conn, err := c.conf.Upstream(network, address)
 	//if err != nil {
 	//	return nil, err
 	//}
 	suo5Conn := &suo5Conn{
-		Suo5Conf: c.conf,
+		Suo5Conf: c.Conf,
 		ctx:      context.Background(),
 	}
 

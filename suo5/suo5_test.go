@@ -14,8 +14,8 @@ func TestSuo5ClientDial(t *testing.T) {
 	}
 
 	client := &Suo5Client{
-		proxy: proxyURL,
-		conf:  conf,
+		Proxy: proxyURL,
+		Conf:  conf,
 	}
 
 	// Test connection
