@@ -11,6 +11,18 @@ import (
 	"time"
 )
 
+func ParseProxyURLs(proxyURL []string) ([]*url.URL, error) {
+	var proxies []*url.URL
+	for _, u := range proxyURL {
+		proxy, err := url.Parse(u)
+		if err != nil {
+			return nil, err
+		}
+		proxies = append(proxies, proxy)
+	}
+	return proxies, nil
+}
+
 func normalizeLink(proxy url.URL) *url.URL {
 	switch strings.ToUpper(proxy.Path) {
 	case "DIRECT", "REJECT", "BLACKHOLE":
