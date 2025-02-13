@@ -3,6 +3,7 @@ package suo5
 import (
 	"fmt"
 	"github.com/gobwas/glob"
+	"net"
 	"net/http"
 	"strings"
 )
@@ -19,12 +20,13 @@ type Suo5Config struct {
 	Timeout          int            `json:"timeout"`
 	Debug            bool           `json:"debug"`
 	UpstreamProxy    string         `json:"upstream_proxy"`
-	RedirectURL      string         `json:"redirect_url"`
-	RawHeader        []string       `json:"raw_header"`
-	DisableHeartbeat bool           `json:"disable_heartbeat"`
-	DisableGzip      bool           `json:"disable_gzip"`
-	EnableCookieJar  bool           `json:"enable_cookiejar"`
-	ExcludeDomain    []string       `json:"exclude_domain"`
+	Upstream         func(network, address string) (net.Conn, error)
+	RedirectURL      string   `json:"redirect_url"`
+	RawHeader        []string `json:"raw_header"`
+	DisableHeartbeat bool     `json:"disable_heartbeat"`
+	DisableGzip      bool     `json:"disable_gzip"`
+	EnableCookieJar  bool     `json:"enable_cookiejar"`
+	ExcludeDomain    []string `json:"exclude_domain"`
 
 	TestExit     string      `json:"-"`
 	ExcludeGlobs []glob.Glob `json:"-"`

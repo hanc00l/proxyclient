@@ -20,7 +20,9 @@ func NewSuo5Client(proxy *url.URL, upstreamDial Dial) (dial Dial, err error) {
 	if err != nil {
 		return nil, err
 	}
-	conf.Upstream = upstreamDial
+	if upstreamDial != nil {
+		conf.Upstream = upstreamDial
+	}
 	c := &suo5.Suo5Client{
 		Proxy: proxy,
 		Conf:  conf,

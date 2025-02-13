@@ -37,12 +37,12 @@ const (
 )
 
 var (
-	NeoregDefaultTimeout        = 5 * time.Second
-	NeoregDefaultMaxRetry       = 10
-	NeoregDefaultInterval       = 100 * time.Millisecond
-	NeoregDefaultReadBufferSize = 32 * 1024
-	saltPrefix                  = []byte("11f271c6lm0e9ypkptad1uv6e1ut1fu0pt4xillz1w9bbs2gegbv89z9gca9d6tbk025uvgjfr331o0szln")
-	BASE64CHARS                 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+	DefaultTimeout        = 5 * time.Second
+	DefaultMaxRetry       = 10
+	DefaultInterval       = 100 * time.Millisecond
+	DefaultReadBufferSize = 32 * 1024
+	saltPrefix            = []byte("11f271c6lm0e9ypkptad1uv6e1ut1fu0pt4xillz1w9bbs2gegbv89z9gca9d6tbk025uvgjfr331o0szln")
+	BASE64CHARS           = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 )
 
 var defaultHeaders = map[string]string{
@@ -106,10 +106,10 @@ func NewConfFromURL(proxyURL *url.URL) (*NeoregConf, error) {
 		Rand:      mt,
 		blvOffset: blvOffset,
 
-		Timeout:        NeoregDefaultTimeout,
-		MaxRetry:       NeoregDefaultMaxRetry,
-		Interval:       NeoregDefaultInterval,
-		ReadBufferSize: NeoregDefaultReadBufferSize,
+		Timeout:        DefaultTimeout,
+		MaxRetry:       DefaultMaxRetry,
+		Interval:       DefaultInterval,
+		ReadBufferSize: DefaultReadBufferSize,
 	}
 
 	if v := query.Get("timeout"); v != "" {

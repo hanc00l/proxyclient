@@ -30,7 +30,6 @@ type Suo5Conf struct {
 	noTimeoutClient *http.Client
 	rawClient       *rawhttp.Client
 	*Suo5Config
-	Upstream func(network, address string) (net.Conn, error)
 }
 
 // NewConfFromURL 从URL中解析用户名密码生成配置
@@ -100,6 +99,9 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 		//logs.Log.Infof("using Upstream proxy %v", proxy)
 		tr.Proxy = http.ProxyURL(u)
 	}
+	if config.Upstream != nil {
+		tr.Dial = config.Upstream
+	}
 	if config.RedirectURL != "" {
 		_, err := url.Parse(config.RedirectURL)
 		if err != nil {
@@ -129,7 +131,6 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 	// 构建 Suo5Conf，并初始化 HTTP 客户端
 	suo5Conf := &Suo5Conf{
 		Suo5Config:      config,
-		Upstream:        net.Dial,
 		normalClient:    normalClient,
 		noTimeoutClient: noTimeoutClient,
 		rawClient:       rawClient,
