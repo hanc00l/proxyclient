@@ -1,6 +1,7 @@
 package socksproxy
 
 import (
+	"context"
 	"crypto/tls"
 	"io"
 	"net"
@@ -8,7 +9,7 @@ import (
 
 type SOCKSConf struct {
 	Auth        func(username, password string) bool
-	Dial        func(network, address string) (net.Conn, error)
+	Dial        func(ctx context.Context, network, address string) (net.Conn, error)
 	HandleError func(error)
 	TLSConfig   *tls.Config
 }

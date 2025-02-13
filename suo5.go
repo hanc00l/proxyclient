@@ -4,6 +4,7 @@
 package proxyclient
 
 import (
+	"context"
 	"github.com/chainreactors/proxyclient/suo5"
 	"net"
 	"net/url"
@@ -28,7 +29,7 @@ func NewSuo5Client(proxy *url.URL, upstreamDial Dial) (dial Dial, err error) {
 		Conf:  conf,
 	}
 
-	return func(network, address string) (net.Conn, error) {
+	return func(ctx context.Context, network, address string) (net.Conn, error) {
 		return c.Dial(network, address)
 	}, nil
 }

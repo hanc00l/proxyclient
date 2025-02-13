@@ -1,6 +1,7 @@
 package proxyclient
 
 import (
+	"context"
 	"errors"
 	"io/ioutil"
 	"net/url"
@@ -41,7 +42,7 @@ func newSSHProxyClient(proxy *url.URL, upstreamDial Dial) (dial Dial, err error)
 	cacheKey := proxy.String()
 
 	if client := globalSSHCache.getClient(cacheKey); client != nil {
-		return Dial(client.Dial).TCPOnly, nil
+		return Dial(client.DialContext).TCPOnly, nil
 	}
 
 	auth, err := sshAuth(proxy)
@@ -53,7 +54,7 @@ func newSSHProxyClient(proxy *url.URL, upstreamDial Dial) (dial Dial, err error)
 		Auth:            auth,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
-	conn, err := upstreamDial("tcp", proxy.Host)
+	conn, err := upstreamDial(context.Background(), "tcp", proxy.Host)
 	if err != nil {
 		return
 	}
@@ -65,7 +66,7 @@ func newSSHProxyClient(proxy *url.URL, upstreamDial Dial) (dial Dial, err error)
 
 	globalSSHCache.setClient(cacheKey, sshClient)
 
-	dial = Dial(sshClient.Dial).TCPOnly
+	dial = Dial(sshClient.DialContext).TCPOnly
 	return
 }
 

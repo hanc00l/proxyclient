@@ -1,6 +1,7 @@
 package socksproxy
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/url"
@@ -8,7 +9,7 @@ import (
 )
 
 type Client interface {
-	Dial(network, address string) (net.Conn, error)
+	Dial(ctx context.Context, network, address string) (net.Conn, error)
 }
 
 func NewClient(proxy *url.URL, conf *SOCKSConf) (client Client, err error) {

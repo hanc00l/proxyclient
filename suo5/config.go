@@ -1,6 +1,7 @@
 package suo5
 
 import (
+	"context"
 	"fmt"
 	"github.com/gobwas/glob"
 	"net"
@@ -20,7 +21,7 @@ type Suo5Config struct {
 	Timeout          int            `json:"timeout"`
 	Debug            bool           `json:"debug"`
 	UpstreamProxy    string         `json:"upstream_proxy"`
-	Upstream         func(network, address string) (net.Conn, error)
+	Upstream         func(ctx context.Context, network, address string) (net.Conn, error)
 	RedirectURL      string   `json:"redirect_url"`
 	RawHeader        []string `json:"raw_header"`
 	DisableHeartbeat bool     `json:"disable_heartbeat"`

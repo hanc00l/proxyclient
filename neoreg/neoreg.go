@@ -2,6 +2,7 @@ package neoreg
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -59,7 +60,7 @@ type NeoregClient struct {
 
 // NeoregConf 配置结构
 type NeoregConf struct {
-	Dial     func(network, address string) (net.Conn, error)
+	Dial     func(ctx context.Context, network, address string) (net.Conn, error)
 	Protocol string // http/https
 
 	EncodeMap map[byte]byte
@@ -98,7 +99,7 @@ func NewConfFromURL(proxyURL *url.URL) (*NeoregConf, error) {
 
 	query := proxyURL.Query()
 	conf := &NeoregConf{
-		Dial:      net.Dial,
+		Dial:      (&net.Dialer{}).DialContext,
 		Protocol:  scheme,
 		EncodeMap: encodeMap,
 		DecodeMap: decodeMap,

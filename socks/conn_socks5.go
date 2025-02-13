@@ -3,6 +3,7 @@ package socksproxy
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"io"
 	"net"
 	"syscall"
@@ -47,7 +48,7 @@ func (c *socks5Conn) Serve() (err error) {
 
 func (c *socks5Conn) handleConnect(request *socks5Request) (err error) {
 	c.sendReply(request, socks5StatusSucceeded)
-	remoteConn, err := c.conf.Dial("tcp", request.Address())
+	remoteConn, err := c.conf.Dial(context.Background(), "tcp", request.Address())
 	if c.sendReplyWithError(request, err) {
 		return
 	}
@@ -58,7 +59,7 @@ func (c *socks5Conn) handleConnect(request *socks5Request) (err error) {
 
 func (c *socks5Conn) handleUDPAssociate(request *socks5Request) (err error) {
 	c.sendUDPReply(request)
-	remoteConn, err := c.conf.Dial("udp", request.Address())
+	remoteConn, err := c.conf.Dial(context.Background(), "udp", request.Address())
 	if c.sendReplyWithError(request, err) {
 		return err
 	}

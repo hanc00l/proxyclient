@@ -1,6 +1,7 @@
 package proxyclient
 
 import (
+	"context"
 	"errors"
 	"net"
 	"net/url"
@@ -62,12 +63,12 @@ func newShadowsocksProxyClient(proxy *url.URL, upstreamDial Dial) (dial Dial, er
 		}
 	}
 
-	conn, err := upstreamDial("tcp", proxy.Host)
+	conn, err := upstreamDial(context.Background(), "tcp", proxy.Host)
 	if err != nil {
 		return nil, err
 	}
 	conn = cipher.StreamConn(conn)
-	dial = func(network, address string) (net.Conn, error) {
+	dial = func(ctx context.Context, network, address string) (net.Conn, error) {
 		host, port, err := net.SplitHostPort(address)
 		if err != nil {
 			return nil, err

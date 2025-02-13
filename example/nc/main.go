@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/url"
@@ -33,7 +34,7 @@ func main() {
 	}
 
 	// 连接目标服务器
-	conn, err := dial("tcp", fmt.Sprintf("%s:%s", targetHost, targetPort))
+	conn, err := dial(context.Background(), "tcp", fmt.Sprintf("%s:%s", targetHost, targetPort))
 	if err != nil {
 		fmt.Printf("Connection failed: %v\n", err)
 		os.Exit(1)

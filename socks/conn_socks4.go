@@ -1,6 +1,7 @@
 package socksproxy
 
 import (
+	"context"
 	"io"
 	"net"
 )
@@ -30,7 +31,7 @@ func (c *socks4Conn) Serve() (err error) {
 }
 
 func (c *socks4Conn) handleConnect(host string) (err error) {
-	remoteConn, err := c.conf.Dial("tcp", host)
+	remoteConn, err := c.conf.Dial(context.Background(), "tcp", host)
 	if err != nil {
 		return err
 	}

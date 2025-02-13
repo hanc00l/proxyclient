@@ -2,6 +2,7 @@ package httpproxy
 
 import (
 	"bufio"
+	"context"
 	"crypto/tls"
 	"errors"
 	"net"
@@ -13,14 +14,14 @@ import (
 type Client struct {
 	Proxy        url.URL
 	TLSConfig    *tls.Config
-	UpstreamDial func(network, address string) (net.Conn, error)
+	UpstreamDial func(ctx context.Context, network, address string) (net.Conn, error)
 }
 
-func NewClient(proxy url.URL, dial func(network, address string) (net.Conn, error)) *Client {
+func NewClient(proxy url.URL, dial func(ctx context.Context, network, address string) (net.Conn, error)) *Client {
 	return &Client{proxy, nil, dial}
 }
 
-func (client *Client) Dial(network, address string) (conn net.Conn, err error) {
+func (client *Client) Dial(ctx context.Context, network, address string) (conn net.Conn, err error) {
 	switch strings.ToUpper(client.Proxy.Scheme) {
 	case "HTTP", "HTTPS":
 	default:
@@ -54,7 +55,7 @@ func (client *Client) Dial(network, address string) (conn net.Conn, err error) {
 }
 
 func (client *Client) connect(network, address string) (conn net.Conn, err error) {
-	conn, err = client.UpstreamDial(network, address)
+	conn, err = client.UpstreamDial(context.Background(), network, address)
 	if err != nil {
 		return
 	}

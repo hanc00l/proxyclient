@@ -63,7 +63,7 @@ func main() {
 	}
 
 	if dial != nil {
-		transport.Dial = dial
+		transport.DialContext = dial
 	}
 
 	client := &http.Client{

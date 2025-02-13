@@ -28,7 +28,7 @@ func normalizeLink(proxy url.URL) *url.URL {
 
 func DialWithTimeout(timeout time.Duration) Dial {
 	dialer := net.Dialer{Timeout: timeout}
-	return dialer.Dial
+	return dialer.DialContext
 }
 
 func decodedBase64EncodedURL(proxy *url.URL) (*url.URL, error) {

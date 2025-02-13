@@ -18,13 +18,11 @@ import (
 	"time"
 )
 
-// Suo5Client 实现了Client接口，用于与目标通信而非直接暴露 SOCKS5 服务
 type Suo5Client struct {
 	Proxy *url.URL
 	Conf  *Suo5Conf
 }
 
-// Suo5Conf 包含了多个类型的 HTTP 客户端，以及嵌入的 Suo5 配置
 type Suo5Conf struct {
 	normalClient    *http.Client
 	noTimeoutClient *http.Client
@@ -100,7 +98,7 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 		tr.Proxy = http.ProxyURL(u)
 	}
 	if config.Upstream != nil {
-		tr.Dial = config.Upstream
+		tr.DialContext = config.Upstream
 	}
 	if config.RedirectURL != "" {
 		_, err := url.Parse(config.RedirectURL)

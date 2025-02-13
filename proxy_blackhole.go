@@ -1,6 +1,7 @@
 package proxyclient
 
 import (
+	"context"
 	"errors"
 	"net"
 	"net/url"
@@ -8,7 +9,7 @@ import (
 )
 
 func newBlackholeProxyClient(_ *url.URL, _ Dial) (dial Dial, err error) {
-	dial = func(network, address string) (net.Conn, error) {
+	dial = func(ctx context.Context, network, address string) (net.Conn, error) {
 		return blackholeConn{}, nil
 	}
 	return

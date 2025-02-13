@@ -1,6 +1,7 @@
 package proxyclient
 
 import (
+	"context"
 	"errors"
 	"net"
 	"net/url"
@@ -18,7 +19,7 @@ func init() {
 }
 
 func newDirectProxyClient(proxy *url.URL, _ Dial) (dial Dial, err error) {
-	dial = net.Dial
+	dial = (&net.Dialer{}).DialContext
 	if timeout, _ := time.ParseDuration(proxy.Query().Get("timeout")); timeout != 0 {
 		dial = DialWithTimeout(timeout)
 	}
@@ -27,12 +28,12 @@ func newDirectProxyClient(proxy *url.URL, _ Dial) (dial Dial, err error) {
 
 func newRejectProxyClient(proxy *url.URL, _ Dial) (dial Dial, err error) {
 	dialErr := errors.New("reject dial")
-	dial = func(network, address string) (net.Conn, error) {
+	dial = func(ctx context.Context, network, address string) (net.Conn, error) {
 		return nil, dialErr
 	}
 	if try, _ := strconv.ParseInt(proxy.Query().Get("try-to-blackhole"), 10, 8); try > 0 {
 		attempt := int64(0)
-		dial = func(network, address string) (net.Conn, error) {
+		dial = func(ctx context.Context, network, address string) (net.Conn, error) {
 			attempt++
 			if attempt > try {
 				return blackholeConn{}, nil

@@ -2,6 +2,7 @@ package socksproxy
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -14,7 +15,7 @@ type Socks4Client struct {
 	conf  *SOCKSConf
 }
 
-func (c *Socks4Client) Dial(network, address string) (remoteConn net.Conn, err error) {
+func (c *Socks4Client) Dial(ctx context.Context, network, address string) (remoteConn net.Conn, err error) {
 	host, port, err := splitHostPort(address)
 	if err != nil {
 		return
@@ -33,7 +34,7 @@ func (c *Socks4Client) Dial(network, address string) (remoteConn net.Conn, err e
 		}
 	}
 
-	remoteConn, err = c.conf.Dial("tcp", c.proxy.Host)
+	remoteConn, err = c.conf.Dial(ctx, "tcp", c.proxy.Host)
 	if err != nil {
 		return
 	}

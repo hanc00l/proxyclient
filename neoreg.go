@@ -4,6 +4,7 @@
 package proxyclient
 
 import (
+	"context"
 	"github.com/chainreactors/proxyclient/neoreg"
 	"net"
 	"net/url"
@@ -27,7 +28,7 @@ func NewNeoregClient(proxy *url.URL, upstreamDial Dial) (dial Dial, err error) {
 		Conf:  conf,
 	}
 
-	return func(network, address string) (net.Conn, error) {
+	return func(ctx context.Context, network, address string) (net.Conn, error) {
 		return client.Dial(network, address)
 	}, nil
 }

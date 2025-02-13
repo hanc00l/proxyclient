@@ -2,6 +2,7 @@ package socksproxy
 
 import (
 	"bufio"
+	"context"
 	"crypto/tls"
 	"errors"
 	"net"
@@ -15,7 +16,7 @@ type Socks5Client struct {
 	tlsConfig *tls.Config
 }
 
-func (c *Socks5Client) Dial(network, address string) (remoteConn net.Conn, err error) {
+func (c *Socks5Client) Dial(ctx context.Context, network, address string) (remoteConn net.Conn, err error) {
 	host, port, err := splitHostPort(address)
 	if err != nil {
 		return
@@ -32,7 +33,7 @@ func (c *Socks5Client) Dial(network, address string) (remoteConn net.Conn, err e
 		return
 	}
 
-	if remoteConn, err = c.conf.Dial(network, c.proxy.Host); err != nil {
+	if remoteConn, err = c.conf.Dial(ctx, network, c.proxy.Host); err != nil {
 		return
 	}
 	if c.isTLS() {
