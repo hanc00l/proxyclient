@@ -36,7 +36,7 @@ type Suo5Conf struct {
 // NewConfFromURL 从URL中解析用户名密码生成配置
 func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 	scheme := "http"
-	switch proxyURL.Scheme {
+	switch strings.ToLower(proxyURL.Scheme) {
 	case "suo5":
 		scheme = "http"
 	case "suo5s":
@@ -155,59 +155,58 @@ func (c *Suo5Client) Dial(network, address string) (net.Conn, error) {
 		return nil, err
 	}
 
-	return WrapConn(suo5Conn.stream), nil
+	return suo5Conn, nil
 }
 
 // suo5Conn 实现了net.Conn接口
 type suo5Conn struct {
-	stream io.ReadWriteCloser
+	io.ReadWriteCloser
 	ctx    context.Context
 	closed bool
 	*Suo5Conf
 }
 
-func (m *suo5Conn) connect(address string) error {
+func (conn *suo5Conn) connect(address string) error {
 	id := RandString(8)
 	var req *http.Request
 	var resp *http.Response
 	var err error
 	host, port, _ := net.SplitHostPort(address)
 	uport, _ := strconv.Atoi(port)
-	dialData := BuildBody(NewActionCreate(id, host, uint16(uport), m.RedirectURL))
-	ch, chWR := netrans.NewChannelWriteCloser(m.ctx)
+	dialData := BuildBody(NewActionCreate(id, host, uint16(uport), conn.RedirectURL))
+	ch, chWR := netrans.NewChannelWriteCloser(conn.ctx)
 	defer chWR.Close()
 
-	baseHeader := m.Header.Clone()
+	baseHeader := conn.Header.Clone()
 
-	if m.Mode == FullDuplex {
+	if conn.Mode == FullDuplex {
 		body := netrans.MultiReadCloser(
 			io.NopCloser(bytes.NewReader(dialData)),
 			io.NopCloser(netrans.NewChannelReader(ch)),
 		)
-		req, _ = http.NewRequestWithContext(m.ctx, m.Method, m.Target, body)
+		req, _ = http.NewRequestWithContext(conn.ctx, conn.Method, conn.Target, body)
 		baseHeader.Set(HeaderKey, HeaderValueFull)
 		req.Header = baseHeader
-		resp, err = m.rawClient.Do(req)
+		resp, err = conn.rawClient.Do(req)
 	} else {
-		req, _ = http.NewRequestWithContext(m.ctx, m.Method, m.Target, bytes.NewReader(dialData))
+		req, _ = http.NewRequestWithContext(conn.ctx, conn.Method, conn.Target, bytes.NewReader(dialData))
 		baseHeader.Set(HeaderKey, HeaderValueHalf)
 		req.Header = baseHeader
-		resp, err = m.noTimeoutClient.Do(req)
+		resp, err = conn.noTimeoutClient.Do(req)
 	}
 	if err != nil {
 		//logs.Log.Debugf("request error to target, %s", err)
 		return err
 	}
 
-	if resp.Header.Get("Set-Cookie") != "" && m.EnableCookieJar {
+	if resp.Header.Get("Set-Cookie") != "" && conn.EnableCookieJar {
 		//logs.Log.Infof("update cookie with %s", resp.Header.Get("Set-Cookie"))
 	}
 
-	defer resp.Body.Close()
 	// skip offset
-	if m.Offset > 0 {
+	if conn.Offset > 0 {
 		//logs.Log.Debugf("skipping offset %d", m.Offset)
-		_, err = io.CopyN(io.Discard, resp.Body, int64(m.Offset))
+		_, err = io.CopyN(io.Discard, resp.Body, int64(conn.Offset))
 		if err != nil {
 			//logs.Log.Errorf("failed to skip offset, %s", err)
 			return err
@@ -231,59 +230,37 @@ func (m *suo5Conn) connect(address string) error {
 	}
 
 	var streamRW io.ReadWriteCloser
-	if m.Mode == FullDuplex {
+	if conn.Mode == FullDuplex {
 		streamRW = NewFullChunkedReadWriter(id, chWR, resp.Body)
 	} else {
-		streamRW = NewHalfChunkedReadWriter(m.ctx, id, m.normalClient, m.Method, m.Target,
-			resp.Body, baseHeader, m.RedirectURL)
+		streamRW = NewHalfChunkedReadWriter(conn.ctx, id, conn.normalClient, conn.Method, conn.Target,
+			resp.Body, baseHeader, conn.RedirectURL)
 	}
 
-	if !m.DisableHeartbeat {
-		streamRW = NewHeartbeatRW(streamRW.(RawReadWriteCloser), id, m.RedirectURL)
+	if !conn.DisableHeartbeat {
+		streamRW = NewHeartbeatRW(streamRW.(RawReadWriteCloser), id, conn.RedirectURL)
 	}
 
-	m.stream = streamRW
+	conn.ReadWriteCloser = streamRW
 	return nil
 }
 
-func WrapConn(rwc io.ReadWriteCloser) net.Conn {
-	return &WrappedConn{
-		rwc: rwc,
-	}
-}
-
-type WrappedConn struct {
-	rwc io.ReadWriteCloser
-}
-
-func (conn *WrappedConn) LocalAddr() net.Addr {
+func (conn *suo5Conn) LocalAddr() net.Addr {
 	return nil
 }
 
-func (conn *WrappedConn) RemoteAddr() net.Addr {
+func (conn *suo5Conn) RemoteAddr() net.Addr {
 	return nil
 }
 
-func (conn *WrappedConn) SetDeadline(t time.Time) error {
+func (conn *suo5Conn) SetDeadline(t time.Time) error {
 	return nil
 }
 
-func (conn *WrappedConn) SetReadDeadline(t time.Time) error {
+func (conn *suo5Conn) SetReadDeadline(t time.Time) error {
 	return nil
 }
 
-func (conn *WrappedConn) SetWriteDeadline(t time.Time) error {
+func (conn *suo5Conn) SetWriteDeadline(t time.Time) error {
 	return nil
-}
-
-func (conn *WrappedConn) Read(p []byte) (n int, err error) {
-	return conn.rwc.Read(p)
-}
-
-func (conn *WrappedConn) Write(p []byte) (n int, err error) {
-	return conn.rwc.Write(p)
-}
-
-func (conn *WrappedConn) Close() error {
-	return conn.rwc.Close()
 }
