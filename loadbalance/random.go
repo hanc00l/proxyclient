@@ -1,6 +1,7 @@
 package loadbalance
 
 import (
+	"context"
 	"math/rand"
 	"net"
 
@@ -8,8 +9,8 @@ import (
 )
 
 func NewRandom(proxies []proxyclient.Dial) proxyclient.Dial {
-	return func(network, address string) (net.Conn, error) {
+	return func(ctx context.Context, network, address string) (net.Conn, error) {
 		dial := proxies[rand.Intn(len(proxies))]
-		return dial(network, address)
+		return dial(ctx, network, address)
 	}
 }

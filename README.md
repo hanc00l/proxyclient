@@ -40,7 +40,7 @@ func main() {
 	// 创建HTTP客户端
 	client := &http.Client{
 		Transport: &http.Transport{
-			DialContext: dial.Context,
+			DialContext: dial.Dial,
 		},
 	}
 
@@ -57,9 +57,9 @@ func main() {
 }
 ```
 
-### 实用工具
+### Example
 
-#### Curl 工具
+#### Curl 
 
 模拟 curl 命令，通过代理访问指定的 URL。
 
@@ -71,7 +71,7 @@ curl <proxy-url> <target-url>
 ./curl http://127.0.0.1:8080 https://example.com
 ```
 
-#### NC 工具
+#### NC 
 
 模拟 nc 命令，通过代理连接指定的主机和端口。
 
@@ -83,7 +83,7 @@ go build ./example/nc
 ./nc http://127.0.0.1:8080 example.com 80
 ```
 
-#### SOCKS5 服务器
+#### SOCKS5 
 
 在本地启动一个 SOCKS5 服务器，将所有流量通过上游代理转发。
 

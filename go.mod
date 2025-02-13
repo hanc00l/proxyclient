@@ -6,7 +6,6 @@ require (
 	github.com/chainreactors/logs v0.0.0-20241115105204-6132e39f5261
 	github.com/gobwas/glob v0.2.3
 	github.com/refraction-networking/utls v1.6.0
-	github.com/seehuhn/mt19937 v1.0.0
 	github.com/shadowsocks/go-shadowsocks2 v0.1.5
 	github.com/stretchr/testify v1.10.0
 	github.com/things-go/go-socks5 v0.0.5
