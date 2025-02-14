@@ -1,10 +1,9 @@
 package suo5
 
 import (
-	"context"
 	"fmt"
 	"github.com/gobwas/glob"
-	"net"
+	"github.com/zema1/rawhttp"
 	"net/http"
 	"strings"
 )
@@ -20,8 +19,8 @@ type Suo5Config struct {
 	BufferSize       int            `json:"buffer_size"`
 	Timeout          int            `json:"timeout"`
 	Debug            bool           `json:"debug"`
-	UpstreamProxy    string         `json:"upstream_proxy"`
-	Upstream         func(ctx context.Context, network, address string) (net.Conn, error)
+	UpstreamProxy    []string       `json:"upstream_proxy"`
+	Upstream         rawhttp.ContextDialFunc
 	RedirectURL      string   `json:"redirect_url"`
 	RawHeader        []string `json:"raw_header"`
 	DisableHeartbeat bool     `json:"disable_heartbeat"`
@@ -99,7 +98,7 @@ func DefaultSuo5Config() *Suo5Config {
 		BufferSize:       1024 * 320,
 		Timeout:          10,
 		Debug:            false,
-		UpstreamProxy:    "",
+		UpstreamProxy:    []string{},
 		RedirectURL:      "",
 		RawHeader:        []string{"User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.1.2.3"},
 		DisableHeartbeat: false,

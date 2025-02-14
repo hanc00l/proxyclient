@@ -84,19 +84,7 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 			return uTlsConn, nil
 		},
 	}
-	if config.UpstreamProxy != "" {
-		proxy := strings.TrimSpace(config.UpstreamProxy)
-		if !strings.HasPrefix(proxy, "socks5") && !strings.HasPrefix(proxy, "http") {
-			return nil, fmt.Errorf("invalid proxy, both socks5 and http(s) are supported, eg: socks5://127.0.0.1:1080")
-		}
-		config.UpstreamProxy = proxy
-		u, err := url.Parse(config.UpstreamProxy)
-		if err != nil {
-			return nil, err
-		}
-		//logs.Log.Infof("using Upstream proxy %v", proxy)
-		tr.Proxy = http.ProxyURL(u)
-	}
+
 	if config.Upstream != nil {
 		tr.DialContext = config.Upstream
 	}
@@ -125,7 +113,7 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 		Jar:       jar,
 		Transport: tr.Clone(),
 	}
-	rawClient := NewRawClient(config.UpstreamProxy, 0)
+	rawClient := NewRawClient(config.Upstream, 0)
 	// 构建 Suo5Conf，并初始化 HTTP 客户端
 	suo5Conf := &Suo5Conf{
 		Suo5Config:      config,

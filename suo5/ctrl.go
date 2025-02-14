@@ -20,7 +20,7 @@ var rander = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func checkConnectMode(config *Suo5Config) (ConnectionType, int, error) {
 	// 这里的 client 需要定义 timeout，不要用外面没有 timeout 的 rawCient
-	rawClient := NewRawClient(config.UpstreamProxy, time.Second*5)
+	rawClient := NewRawClient(config.Upstream, time.Second*5)
 	randLen := rander.Intn(1024)
 	if randLen <= 32 {
 		randLen += 32
@@ -144,7 +144,7 @@ func RandString(n int) string {
 	return string(b)
 }
 
-func NewRawClient(upstream string, timeout time.Duration) *rawhttp.Client {
+func NewRawClient(upstream rawhttp.ContextDialFunc, timeout time.Duration) *rawhttp.Client {
 	return rawhttp.NewClient(&rawhttp.Options{
 		Proxy:                  upstream,
 		Timeout:                timeout,
