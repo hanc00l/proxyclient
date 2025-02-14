@@ -9,6 +9,6 @@ require (
 	github.com/shadowsocks/go-shadowsocks2 v0.1.5
 	github.com/stretchr/testify v1.10.0
 	github.com/things-go/go-socks5 v0.0.5
-	github.com/zema1/rawhttp v0.1.1
+	github.com/zema1/rawhttp v0.2.0
 	golang.org/x/crypto v0.21.0
 )
