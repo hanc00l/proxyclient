@@ -1,21 +1,22 @@
 //go:build neoreg
 // +build neoreg
 
-package proxyclient
+package extend
 
 import (
 	"context"
+	"github.com/chainreactors/proxyclient"
 	"github.com/chainreactors/proxyclient/neoreg"
 	"net"
 	"net/url"
 )
 
 func init() {
-	RegisterScheme("NEOREG", NewNeoregClient)
-	RegisterScheme("NEOREGS", NewNeoregClient)
+	proxyclient.RegisterScheme("NEOREG", NewNeoregClient)
+	proxyclient.RegisterScheme("NEOREGS", NewNeoregClient)
 }
 
-func NewNeoregClient(proxy *url.URL, upstreamDial Dial) (dial Dial, err error) {
+func NewNeoregClient(proxy *url.URL, upstreamDial proxyclient.Dial) (dial proxyclient.Dial, err error) {
 	conf, err := neoreg.NewConfFromURL(proxy)
 	if err != nil {
 		return nil, err

@@ -25,8 +25,6 @@ func init() {
 	RegisterScheme("SOCKS5+TLS", newSocksProxyClient)
 	RegisterScheme("HTTP", newHTTPProxyClient)
 	RegisterScheme("HTTPS", newHTTPProxyClient)
-	RegisterScheme("SS", newShadowsocksProxyClient)
-	RegisterScheme("SSH", newSSHProxyClient)
 }
 
 func NewClient(proxy *url.URL) (Dial, error) {
