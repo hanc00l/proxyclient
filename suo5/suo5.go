@@ -34,11 +34,11 @@ func NewConfFromURL(proxyURL *url.URL) (*Suo5Conf, error) {
 
 	// 使用这些值构建配置
 	config := suo5.DefaultSuo5Config()
+	config.Target = fmt.Sprintf("%s://%s%s", scheme, proxyURL.Host, proxyURL.Path)
 	client, err := config.Init()
 	if err != nil {
 		return nil, err
 	}
-	config.Target = fmt.Sprintf("%s://%s%s", scheme, proxyURL.Host, proxyURL.Path)
 
 	suo5Conf := &Suo5Conf{
 		Suo5Config: config,
