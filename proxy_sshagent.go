@@ -42,7 +42,7 @@ func newSSHProxyClient(proxy *url.URL, upstreamDial Dial) (dial Dial, err error)
 	cacheKey := proxy.String()
 
 	if client := globalSSHCache.getClient(cacheKey); client != nil {
-		return Dial(client.DialContext).TCPOnly, nil
+		return WrapDialerContext(client.Dial).TCPOnly, nil
 	}
 
 	auth, err := sshAuth(proxy)
@@ -66,7 +66,7 @@ func newSSHProxyClient(proxy *url.URL, upstreamDial Dial) (dial Dial, err error)
 
 	globalSSHCache.setClient(cacheKey, sshClient)
 
-	dial = Dial(sshClient.DialContext).TCPOnly
+	dial = WrapDialerContext(sshClient.Dial).TCPOnly
 	return
 }
 

@@ -1,6 +1,7 @@
 package proxyclient
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
@@ -21,6 +22,12 @@ func ParseProxyURLs(proxyURL []string) ([]*url.URL, error) {
 		proxies = append(proxies, proxy)
 	}
 	return proxies, nil
+}
+
+func WrapDialerContext(dialer func(network, address string) (net.Conn, error)) Dial {
+	return func(ctx context.Context, network, address string) (net.Conn, error) {
+		return dialer(network, address)
+	}
 }
 
 func normalizeLink(proxy url.URL) *url.URL {
