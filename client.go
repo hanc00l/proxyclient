@@ -12,6 +12,7 @@ type Dial func(ctx context.Context, network, address string) (net.Conn, error)
 
 type DialFactory func(*url.URL, Dial) (Dial, error)
 
+var DefaultDial = (&net.Dialer{}).DialContext
 var schemes = map[string]DialFactory{}
 
 func init() {
@@ -28,11 +29,11 @@ func init() {
 }
 
 func NewClient(proxy *url.URL) (Dial, error) {
-	return NewClientWithDial(proxy, (&net.Dialer{}).DialContext)
+	return NewClientWithDial(proxy, DefaultDial)
 }
 
 func NewClientChain(proxies []*url.URL) (Dial, error) {
-	return NewClientChainWithDial(proxies, (&net.Dialer{}).DialContext)
+	return NewClientChainWithDial(proxies, DefaultDial)
 }
 
 func NewClientWithDial(proxy *url.URL, upstreamDial Dial) (_ Dial, err error) {
